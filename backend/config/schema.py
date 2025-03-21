@@ -1,5 +1,4 @@
 import base64
-import pathlib
 from uuid import UUID
 
 from ariadne import (
@@ -71,28 +70,9 @@ def serialize_opaque_id(value):
     value = f"{value.id}:{content_type.id}"
     return base64.b64encode(value.encode("utf-8")).decode("utf-8")
 
-
-type_defs = load_schema_from_path(
-    f"{pathlib.Path(__file__).parent.resolve()}/graphql/schema.graphql"
-)
 schema = make_executable_schema(
     [
-        type_defs,
-        identity_type_defs,
-        tags_type_defs,
-        dags_type_defs,
-        *s3_type_defs,
-        accessmod_type_defs,
-        countries_type_defs,
-        notebooks_type_defs,
-        pipelines_type_defs,
-        pipeline_templates_type_defs,
-        workspaces_type_def,
-        metadata_type_def,
-        databases_types_def,
-        files_type_def,
-        config_type_defs,
-        datasets_type_defs,
+        load_schema_from_path("schema.graphql")
     ],
     [
         uuid_scalar,

@@ -1550,12 +1550,49 @@ type DHIS2Connection implements Connection {
   user: User
   fields: [ConnectionField!]!
   permissions: ConnectionPermissions!
-  queryMetadata(type: String!, filter: String): DHIS2QueryResult!
+  status: DHIS2ConnectionStatus! # Connection status
+  queryMetadata(type: DHIS2MetadataType!, filters: [String!], perPage: Int, page:Int): DHIS2QueryResultPage! # Query metadata items
 }
 
+"""
+DHIS2 connection error
+"""
 enum DHIS2ConnectionError {
-  CONNECTION_ERROR
-  UNKNOWN_ERROR
+    REQUEST_ERROR
+    UNKNOWN_ERROR
+}
+"""
+DHIS2 connection status
+"""
+enum DHIS2ConnectionStatus {
+    UP
+    DOWN
+    UNKNOWN
+}
+"""
+DHIS2 metadata query result
+"""
+type DHIS2QueryResultPage {
+    items: [DHIS2MetadataItem!]  # List of metadata items
+    pageNumber: Int!                   # Current page number
+    totalPages: Int!                # Number of items per page
+    totalItems: Int!             # Total number of items
+    success: Boolean!           # Query success status
+    error: DHIS2ConnectionError # Connection error
+}
+
+"""
+Enum representing the type of a DHIS2 metadata item.
+"""
+enum DHIS2MetadataType {
+    ORG_UNITS
+    ORG_UNIT_GROUPS
+    ORG_UNIT_LEVELS
+    DATASETS
+    DATA_ELEMENTS
+    DATA_ELEMENT_GROUPS
+    INDICATORS
+    INDICATOR_GROUPS
 }
 
 """DHIS2 metadata item"""
@@ -2702,7 +2739,7 @@ enum PrepareObjectUploadError {
 
 """
 Input for preparing to upload an object to a workspace's bucket.
-The `contentType` 
+The `contentType`
 """
 input PrepareObjectUploadInput {
   workspaceSlug: String!
