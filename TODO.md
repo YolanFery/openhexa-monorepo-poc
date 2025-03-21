@@ -1,0 +1,8 @@
+- Shared GraphQL
+  - Merge GraphQL schemas
+- Github Actions
+  - Test & build of the frontend when frontend/ changes
+  - Test & build of the app  when backend/ changes
+  - Integration tests when * changes
+  - Watch on the graphql changes to generate codegen
+- Dev container on PR
