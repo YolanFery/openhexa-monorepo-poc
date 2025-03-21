@@ -46,7 +46,11 @@ For details please refer to the [Frontend README](frontend/README.md).
     ```sh
     npm install
     ```
-3. Run the frontend development server:
+3. Copy `.env.local.dist` and adapt it to your needs:
+    ```sh
+    cp .env.local.dist .env.local  # adapt the .env file with the required configuration values
+    ```
+4. Run the frontend development server:
     ```sh
     npm run dev
     ```

@@ -28,7 +28,7 @@
     ]
   },
   "graphql": {
-    "schema": "./schema.graphql"
+    "schema": "../backend/schema.graphql"
   },
   "dependencies": {
     "@apollo/client": "^3.11.8",
