@@ -3,9 +3,6 @@ name: Build Docker Images
 on:
   release:
     types: [published]
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       tag:
