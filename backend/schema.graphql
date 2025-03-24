@@ -1585,7 +1585,6 @@ type DHIS2QueryResultPage {
 Enum representing the type of a DHIS2 metadata item.
 """
 enum DHIS2MetadataType {
-    ORG_UNITS
     ORG_UNIT_GROUPS
     ORG_UNIT_LEVELS
     DATASETS

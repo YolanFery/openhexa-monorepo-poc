@@ -1,4 +1,4 @@
-name: Lint & Test Backend
+name: Backend CI
 on:
   pull_request:
     paths:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   pre-commit:
-    name: Pre-commit
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
           PRE_COMMIT_HOME: backend/.cache/pre-commit
 
   test:
-    name: Run test suite
+    name: Test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -52,7 +52,7 @@ jobs:
             var-cache-apt
             var-lib-apt
             root-.cache
-          key: cache-${{ hashFiles('backend/Dockerfile') }}
+          key: cache-${{ hashFiles('Dockerfile') }}
 
       - name: inject cache into docker
         uses: reproducible-containers/buildkit-cache-dance@v3.1.2
