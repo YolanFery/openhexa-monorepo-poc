@@ -403,7 +403,7 @@ sqlparse==0.5.3
     #   django-debug-toolbar
 starlette==0.45.3
     # via ariadne
-stringcase==1.2.0
+#stringcase==1.2.0
     # via -r requirements.in
 tblib==3.0.0
     # via -r requirements.in
