@@ -1,5 +1,4 @@
 ## Required
-- Husky
 - Github Actions
   - Test & build of the frontend when frontend/ changes
   - Test & build of the app  when backend/ changes
