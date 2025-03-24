@@ -50,7 +50,7 @@ function AccountPage() {
       variables: { input: { invitationId: invitation.id } },
     });
     if (!data?.joinWorkspace.success) {
-      toast.error(t("Failed to accept invitations"));
+      toast.error(t("Failed to accept invitation"));
     }
   }
 
