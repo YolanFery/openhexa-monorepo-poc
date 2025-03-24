@@ -74,11 +74,11 @@ jobs:
       - name: Build docker app image
         env:
           DOCKER_BUILDKIT: 1
-        run: docker compose -f docker-compose.yml build --build-arg DJANGO_SETTINGS_MODULE="config.settings.dev"
+        run: docker compose build --build-arg DJANGO_SETTINGS_MODULE="config.settings.dev"
 
       - name: Run Django tests
         run: |
-          docker compose -f docker-compose.yml run -e DEBUG=false -u $(id -u):$(id -g) app coveraged-test
+          docker compose run -e DEBUG=false -u $(id -u):$(id -g) app coveraged-test
 
       # Push on main
       - name: Build and push (on main)

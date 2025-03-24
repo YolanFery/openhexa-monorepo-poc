@@ -1,9 +1,10 @@
 ## Required
 - Fix backend-ci to run on PR
-  - precommit to run only on directory
   - testing should work
+  - Name of worklfows
 - Fix frontend-ci to run on PR
-  -  precommit to run only on directory
+  - precommit to run only on directory
+  - Name of worklfows
 - Fix release-please to run on merge
 - Fix build-docker to run on release
 ## Optional 
