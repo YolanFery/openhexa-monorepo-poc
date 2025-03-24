@@ -1,4 +1,4 @@
-name: Backend CI
+name: Backend
 on:
   pull_request:
     paths:
@@ -22,7 +22,7 @@ jobs:
           PRE_COMMIT_HOME: backend/.cache/pre-commit
 
   test:
-    name: Test
+    name: Build & Test
     runs-on: ubuntu-latest
     defaults:
       run:

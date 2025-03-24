@@ -1058,7 +1058,6 @@ export enum Dhis2MetadataType {
   DataElementGroups = 'DATA_ELEMENT_GROUPS',
   Indicators = 'INDICATORS',
   IndicatorGroups = 'INDICATOR_GROUPS',
-  OrgUnits = 'ORG_UNITS',
   OrgUnitGroups = 'ORG_UNIT_GROUPS',
   OrgUnitLevels = 'ORG_UNIT_LEVELS'
 }
