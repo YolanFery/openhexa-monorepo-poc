@@ -1,13 +1,20 @@
 name: Lint & Test Backend
 on:
   pull_request:
+    paths:
+      - 'backend/**'
   push:
     branches: [ main ]
+    paths:
+      - 'backend/**'
 
 jobs:
   pre-commit:
     name: Pre-commit
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -16,7 +23,9 @@ jobs:
   test:
     name: Run test suite
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,7 +51,7 @@ jobs:
             var-cache-apt
             var-lib-apt
             root-.cache
-          key: cache-${{ hashFiles('Dockerfile') }}
+          key: cache-${{ hashFiles('backend/Dockerfile') }}
 
       - name: inject cache into docker
         uses: reproducible-containers/buildkit-cache-dance@v3.1.2
@@ -53,32 +62,31 @@ jobs:
               "var-lib-apt": "/var/lib/apt",
               "root-.cache": "/root/.cache"
             }
-    
           skip-extraction: ${{ steps.cache.outputs.cache-hit }}
 
       - name: Create docker network
         run: docker network create openhexa
-      
+
       - name: Copy .env file
-        run: cp .env.dist .env
+        run: cp backend/.env.dist backend/.env
 
       - name: Build docker app image
         env:
           DOCKER_BUILDKIT: 1
-        run: docker compose build --build-arg DJANGO_SETTINGS_MODULE="config.settings.dev"
+        run: docker compose -f backend/docker-compose.yml build --build-arg DJANGO_SETTINGS_MODULE="config.settings.dev"
 
       - name: Run Django tests
         run: |
-          docker compose run -e DEBUG=false -u $(id -u):$(id -g) app coveraged-test
+          docker compose -f backend/docker-compose.yml run -e DEBUG=false -u $(id -u):$(id -g) app coveraged-test
 
       # Push on main
       - name: Build and push (on main)
         uses: docker/build-push-action@v6
         with:
-          push: ${{ github.event_name != 'pull_request' }} 
-          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          context: backend
           target: app
-          file: Dockerfile
+          file: backend/Dockerfile
           build-args: |
             DJANGO_SETTINGS_MODULE=config.settings.dev
           cache-from: type=registry,ref=blsq/openhexa-app:buildcache
