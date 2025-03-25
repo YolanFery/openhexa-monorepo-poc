@@ -725,26 +725,6 @@ enum CreatePipelineFromTemplateVersionError {
 }
 
 """
-Represents the input for deleting a pipeline template.
-"""
-input DeletePipelineTemplateInput {
-  id: UUID!
-}
-
-"""
-Represents the result of deleting a pipeline.
-"""
-type DeletePipelineTemplateResult {
-  success: Boolean!
-  errors: [PipelineTemplateError!]!
-}
-
-enum PipelineTemplateError {
-  PIPELINE_TEMPLATE_NOT_FOUND
-  PERMISSION_DENIED
-}
-
-"""
 Represents the input for creating a new pipeline from a template version.
 """
 input CreatePipelineFromTemplateVersionInput {
@@ -1405,6 +1385,17 @@ type DeletePipelineResult {
   errors: [PipelineError!]!
 }
 
+"""Represents the input for deleting a pipeline template."""
+input DeletePipelineTemplateInput {
+  id: UUID!
+}
+
+"""Represents the result of deleting a pipeline."""
+type DeletePipelineTemplateResult {
+  success: Boolean!
+  errors: [PipelineTemplateError!]!
+}
+
 enum DeletePipelineVersionError {
   PIPELINE_VERSION_NOT_FOUND
   PERMISSION_DENIED
@@ -1450,6 +1441,23 @@ type DeleteTeamResult {
 
   """The list of errors that occurred during the deleteTeam mutation."""
   errors: [DeleteTeamError!]!
+}
+
+enum DeleteTemplateVersionError {
+  TEMPLATE_VERSION_NOT_FOUND
+  PERMISSION_DENIED
+  TEMPLATE_NOT_FOUND
+}
+
+"""Represents the input for deleting a template version."""
+input DeleteTemplateVersionInput {
+  id: UUID!
+}
+
+"""Represents the result of deleting a template version."""
+type DeleteTemplateVersionResult {
+  success: Boolean!
+  errors: [DeleteTemplateVersionError!]!
 }
 
 enum DeleteWorkspaceDatabaseTableError {
@@ -1550,49 +1558,21 @@ type DHIS2Connection implements Connection {
   user: User
   fields: [ConnectionField!]!
   permissions: ConnectionPermissions!
-  status: DHIS2ConnectionStatus! # Connection status
-  queryMetadata(type: DHIS2MetadataType!, filters: [String!], perPage: Int, page:Int): DHIS2QueryResultPage! # Query metadata items
+  status: DHIS2ConnectionStatus!
+  queryMetadata(type: DHIS2MetadataType!, filters: [String!], perPage: Int, page: Int): DHIS2QueryResultPage!
 }
 
-"""
-DHIS2 connection error
-"""
+"""DHIS2 connection error"""
 enum DHIS2ConnectionError {
-    REQUEST_ERROR
-    UNKNOWN_ERROR
-}
-"""
-DHIS2 connection status
-"""
-enum DHIS2ConnectionStatus {
-    UP
-    DOWN
-    UNKNOWN
-}
-"""
-DHIS2 metadata query result
-"""
-type DHIS2QueryResultPage {
-    items: [DHIS2MetadataItem!]  # List of metadata items
-    pageNumber: Int!                   # Current page number
-    totalPages: Int!                # Number of items per page
-    totalItems: Int!             # Total number of items
-    success: Boolean!           # Query success status
-    error: DHIS2ConnectionError # Connection error
+  REQUEST_ERROR
+  UNKNOWN_ERROR
 }
 
-"""
-Enum representing the type of a DHIS2 metadata item.
-"""
-enum DHIS2MetadataType {
-    ORG_UNITS
-    ORG_UNIT_GROUPS
-    ORG_UNIT_LEVELS
-    DATASETS
-    DATA_ELEMENTS
-    DATA_ELEMENT_GROUPS
-    INDICATORS
-    INDICATOR_GROUPS
+"""DHIS2 connection status"""
+enum DHIS2ConnectionStatus {
+  UP
+  DOWN
+  UNKNOWN
 }
 
 """DHIS2 metadata item"""
@@ -1601,9 +1581,31 @@ type DHIS2MetadataItem {
   name: String!
 }
 
+"""Enum representing the type of a DHIS2 metadata item."""
+enum DHIS2MetadataType {
+  ORG_UNITS
+  ORG_UNIT_GROUPS
+  ORG_UNIT_LEVELS
+  DATASETS
+  DATA_ELEMENTS
+  DATA_ELEMENT_GROUPS
+  INDICATORS
+  INDICATOR_GROUPS
+}
+
 """DHIS2 metadata query result"""
 type DHIS2QueryResult {
   items: [DHIS2MetadataItem!]
+  success: Boolean!
+  error: DHIS2ConnectionError
+}
+
+"""DHIS2 metadata query result"""
+type DHIS2QueryResultPage {
+  items: [DHIS2MetadataItem!]
+  pageNumber: Int!
+  totalPages: Int!
+  totalItems: Int!
   success: Boolean!
   error: DHIS2ConnectionError
 }
@@ -2190,7 +2192,7 @@ type Mutation {
   """Creates a new pipeline template version."""
   createPipelineTemplateVersion(input: CreatePipelineTemplateVersionInput!): CreatePipelineTemplateVersionResult!
   createPipelineFromTemplateVersion(input: CreatePipelineFromTemplateVersionInput!): CreatePipelineFromTemplateVersionResult!
-  deletePipelineTemplate(input: DeletePipelineTemplateInput): DeletePipelineTemplateResult! @loginRequired
+  deletePipelineTemplate(input: DeletePipelineTemplateInput): DeletePipelineTemplateResult!
   createWorkspace(input: CreateWorkspaceInput!): CreateWorkspaceResult!
   updateWorkspace(input: UpdateWorkspaceInput!): UpdateWorkspaceResult!
   deleteWorkspace(input: DeleteWorkspaceInput!): DeleteWorkspaceResult!
@@ -2267,7 +2269,6 @@ type Mutation {
 
   """Updates an existing template."""
   updatePipelineTemplate(input: UpdateTemplateInput!): UpdateTemplateResult!
-
   updateTemplateVersion(input: UpdateTemplateVersionInput!): UpdateTemplateVersionResult!
   deleteTemplateVersion(input: DeleteTemplateVersionInput!): DeleteTemplateVersionResult!
 }
@@ -2560,6 +2561,11 @@ type PipelineTemplate {
   permissions: PipelineTemplatePermissions!
 }
 
+enum PipelineTemplateError {
+  PIPELINE_TEMPLATE_NOT_FOUND
+  PERMISSION_DENIED
+}
+
 """Represents paged result of fetching pipeline templates."""
 type PipelineTemplatePage {
   pageNumber: Int!
@@ -2572,16 +2578,6 @@ type PipelineTemplatePage {
 type PipelineTemplatePermissions {
   delete: Boolean!
   update: Boolean!
-}
-
-"""
-Represents a page of template versions.
-"""
-type TemplateVersionPage {
-  items: [PipelineTemplateVersion!]!
-  pageNumber: Int!
-  totalPages: Int!
-  totalItems: Int!
 }
 
 """Represents a version of a pipeline template."""
@@ -2815,6 +2811,7 @@ type Query {
 
   """Retrieves a pipeline by workspace slug and code."""
   pipelineByCode(workspaceSlug: String!, code: String!): Pipeline
+
   """Retrieves a template by code."""
   templateByCode(code: String!): PipelineTemplate
 
@@ -3201,6 +3198,14 @@ type TeamPermissions {
   delete: Boolean!
 }
 
+"""Represents a page of template versions."""
+type TemplateVersionPage {
+  items: [PipelineTemplateVersion!]!
+  pageNumber: Int!
+  totalPages: Int!
+  totalItems: Int!
+}
+
 scalar TimeThresholds
 
 enum UpdateAccessmodAccessibilityAnalysisError {
@@ -3449,29 +3454,6 @@ input UpdatePipelineInput {
   webhookEnabled: Boolean
 }
 
-"""
-Enum representing the possible errors that can occur when updating a template.
-"""
-enum UpdateTemplateError {
-  NOT_FOUND
-  PERMISSION_DENIED
-}
-
-"""Represents the input for updating a template."""
-input UpdateTemplateInput {
-  id: UUID!
-  name: String
-  config: JSON
-  description: String
-}
-
-"""Represents the result of updating a template."""
-type UpdateTemplateResult {
-  success: Boolean!
-  errors: [UpdateTemplateError!]!
-  template: PipelineTemplate
-}
-
 """Represents the input for updating the progress of a pipeline."""
 input UpdatePipelineProgressInput {
   percent: Int!
@@ -3563,6 +3545,50 @@ type UpdateTeamResult {
 
   """The list of errors that occurred during the updateTeam mutation."""
   errors: [UpdateTeamError!]!
+}
+
+"""
+Enum representing the possible errors that can occur when updating a template.
+"""
+enum UpdateTemplateError {
+  NOT_FOUND
+  PERMISSION_DENIED
+}
+
+"""Represents the input for updating a template."""
+input UpdateTemplateInput {
+  id: UUID!
+  name: String
+  config: JSON
+  description: String
+}
+
+"""Represents the result of updating a template."""
+type UpdateTemplateResult {
+  success: Boolean!
+  errors: [UpdateTemplateError!]!
+  template: PipelineTemplate
+}
+
+"""
+Enum representing the possible errors that can occur when updating a template version.
+"""
+enum UpdateTemplateVersionError {
+  NOT_FOUND
+  PERMISSION_DENIED
+}
+
+"""Represents the input for updating a template version."""
+input UpdateTemplateVersionInput {
+  id: UUID!
+  changelog: String
+}
+
+"""Represents the result of updating a template version."""
+type UpdateTemplateVersionResult {
+  success: Boolean!
+  errors: [UpdateTemplateVersionError!]!
+  templateVersion: PipelineTemplateVersion
 }
 
 """
@@ -3880,52 +3906,5 @@ type WorkspacePermissions {
 
   """Permissions to create a dataset in the workspace"""
   createDataset: Boolean!
-}
-
-
-"""
-Represents the input for deleting a template version.
-"""
-input DeleteTemplateVersionInput {
-  id: UUID!
-}
-
-"""
-Represents the result of deleting a template version.
-"""
-type DeleteTemplateVersionResult {
-  success: Boolean!
-  errors: [DeleteTemplateVersionError!]!
-}
-
-enum DeleteTemplateVersionError {
-  TEMPLATE_VERSION_NOT_FOUND
-  PERMISSION_DENIED
-  TEMPLATE_NOT_FOUND
-}
-
-"""
-Represents the input for updating a template version.
-"""
-input UpdateTemplateVersionInput {
-  id: UUID!
-  changelog: String
-}
-
-"""
-Enum representing the possible errors that can occur when updating a template version.
-"""
-enum UpdateTemplateVersionError {
-  NOT_FOUND
-  PERMISSION_DENIED
-}
-
-"""
-Represents the result of updating a template version.
-"""
-type UpdateTemplateVersionResult {
-  success: Boolean!
-  errors: [UpdateTemplateVersionError!]!
-  templateVersion: PipelineTemplateVersion
 }
 
