@@ -1,4 +1,4 @@
-name: Lint & Test Backend
+name: Backend
 on:
   pull_request:
     paths:
@@ -10,18 +10,19 @@ on:
 
 jobs:
   pre-commit:
-    name: Pre-commit
+    name: Lint
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
       - uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --config backend/.pre-commit-config.yaml
+        env:
+          PRE_COMMIT_HOME: backend/.cache/pre-commit
 
   test:
-    name: Run test suite
+    name: Build & Test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -51,7 +52,7 @@ jobs:
             var-cache-apt
             var-lib-apt
             root-.cache
-          key: cache-${{ hashFiles('backend/Dockerfile') }}
+          key: cache-${{ hashFiles('Dockerfile') }}
 
       - name: inject cache into docker
         uses: reproducible-containers/buildkit-cache-dance@v3.1.2
@@ -68,16 +69,16 @@ jobs:
         run: docker network create openhexa
 
       - name: Copy .env file
-        run: cp backend/.env.dist backend/.env
+        run: cp .env.dist .env
 
       - name: Build docker app image
         env:
           DOCKER_BUILDKIT: 1
-        run: docker compose -f backend/docker-compose.yml build --build-arg DJANGO_SETTINGS_MODULE="config.settings.dev"
+        run: docker compose build --build-arg DJANGO_SETTINGS_MODULE="config.settings.dev"
 
       - name: Run Django tests
         run: |
-          docker compose -f backend/docker-compose.yml run -e DEBUG=false -u $(id -u):$(id -g) app coveraged-test
+          docker compose run -e DEBUG=false -u $(id -u):$(id -g) app coveraged-test
 
       # Push on main
       - name: Build and push (on main)
@@ -89,9 +90,9 @@ jobs:
           file: backend/Dockerfile
           build-args: |
             DJANGO_SETTINGS_MODULE=config.settings.dev
-          cache-from: type=registry,ref=blsq/openhexa-app:buildcache
-          cache-to: type=registry,ref=blsq/openhexa-app:buildcache,mode=max
+          cache-from: type=registry,ref=yolanfe/yf:buildcache
+          cache-to: type=registry,ref=yolanfe/yf:buildcache,mode=max
           tags: |
-            blsq/openhexa-app:main
-            blsq/openhexa-app:latest
+            yolanfe/yf:main
+            yolanfe/yf:latest
       

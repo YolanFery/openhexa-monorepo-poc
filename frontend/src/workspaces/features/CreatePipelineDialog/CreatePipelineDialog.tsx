@@ -60,14 +60,6 @@ const CreatePipelineDialog = (props: CreatePipelineDialogProps) => {
             router.query.workspaceSlug as string,
           )}/pipelines/${encodeURIComponent(pipeline.code)}`,
         );
-      } else if (
-        data?.createPipeline.errors.includes(
-          PipelineError.PipelineAlreadyExists,
-        )
-      ) {
-        throw new Error(
-          t("A pipeline with the selected notebook already exist"),
-        );
       } else {
         throw new Error(t("An error occurred while creating the pipeline."));
       }
