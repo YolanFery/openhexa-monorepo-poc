@@ -4,7 +4,10 @@ from hexa.workspaces.models import Workspace, WorkspaceMembershipRole
 
 
 def create_pipeline_template_version(principal: User, workspace: Workspace):
-    return True
+    return workspace.workspacemembership_set.filter(
+        user=principal,
+        role__in=[WorkspaceMembershipRole.EDITOR, WorkspaceMembershipRole.ADMIN],
+    ).exists()
 
 def delete_pipeline_template(principal: User, pipeline_template: PipelineTemplate):
     return (
