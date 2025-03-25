@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.76.0](https://github.com/YolanFery/openhexa-monorepo-poc/compare/0.75.2...0.76.0) (2025-03-25)
+
+
+### Features
+
+* Test ([611f062](https://github.com/YolanFery/openhexa-monorepo-poc/commit/611f062f70091c95f15b3c5f4806ce9b7dec221f))
+
 ## [0.75.2](https://github.com/YolanFery/openhexa-monorepo-poc/compare/0.100.0...0.75.2) (2025-03-25)
 
 
