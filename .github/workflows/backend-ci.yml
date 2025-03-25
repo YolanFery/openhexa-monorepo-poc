@@ -87,7 +87,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           context: backend
           target: app
-          file: Dockerfile
+          file: backend/Dockerfile
           build-args: |
             DJANGO_SETTINGS_MODULE=config.settings.dev
           cache-from: type=registry,ref=yolanfe/yf:buildcache
