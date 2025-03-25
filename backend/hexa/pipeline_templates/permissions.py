@@ -9,6 +9,7 @@ def create_pipeline_template_version(principal: User, workspace: Workspace):
         role__in=[WorkspaceMembershipRole.EDITOR, WorkspaceMembershipRole.ADMIN],
     ).exists()
 
+
 def delete_pipeline_template(principal: User, pipeline_template: PipelineTemplate):
     return (
         pipeline_template.workspace

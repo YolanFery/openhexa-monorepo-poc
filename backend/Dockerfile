@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/root/.cache \
 COPY requirements.txt /code/
 
 RUN --mount=type=cache,target=/root/.cache \
-    pip install -r requirements.txt && \
+    pip install -r requirements.txt  && \
     apt-get remove -y build-essential && \
     apt-get autoremove -y
 
