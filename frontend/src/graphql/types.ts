@@ -1651,7 +1651,6 @@ export type DeleteTeamResult = {
 
 export enum DeleteTemplateVersionError {
   PermissionDenied = 'PERMISSION_DENIED',
-  TemplateNotFound = 'TEMPLATE_NOT_FOUND',
   TemplateVersionNotFound = 'TEMPLATE_VERSION_NOT_FOUND'
 }
 
