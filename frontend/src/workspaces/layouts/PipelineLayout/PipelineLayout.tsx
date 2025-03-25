@@ -196,7 +196,10 @@ PipelineLayout.fragments = {
         run
         delete
         update
-        createTemplateVersion
+        createTemplateVersion {
+          isAllowed
+          reasons
+        }
       }
       template {
         id

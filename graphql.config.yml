@@ -1,1 +1,1 @@
-schema: backend/schema.graphql
+schema: backend/**/schema.graphql
