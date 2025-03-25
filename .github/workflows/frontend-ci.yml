@@ -4,12 +4,12 @@ on:
   pull_request:
     paths:
       - 'frontend/**'
-      - 'backend/schema.graphql'
+      - 'backend/**/schema.graphql'
   push:
     branches: [main]
     paths:
       - 'frontend/**'
-      - 'backend/schema.graphql'
+      - 'backend/**/schema.graphql'
 
 env:
   CI: true
