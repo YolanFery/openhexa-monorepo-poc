@@ -721,7 +721,6 @@ enum CreatePipelineFromTemplateVersionError {
   PERMISSION_DENIED
   WORKSPACE_NOT_FOUND
   PIPELINE_TEMPLATE_VERSION_NOT_FOUND
-  PIPELINE_ALREADY_EXISTS
 }
 
 """
@@ -743,8 +742,7 @@ type CreatePipelineFromTemplateVersionResult {
 
 """Represents the input for creating a pipeline."""
 input CreatePipelineInput {
-  code: String!
-  name: String
+  name: String!
   workspaceSlug: String!
   notebookPath: String
 }
@@ -825,6 +823,22 @@ type CreateTeamResult {
 
   """The list of errors that occurred during the createTeam mutation."""
   errors: [CreateTeamError!]!
+}
+
+"""Represents the permission details for creating a template version."""
+type CreateTemplateVersionPermission {
+  isAllowed: Boolean!
+  reasons: [CreateTemplateVersionPermissionReason!]!
+}
+
+"""
+Enum representing the possible reasons preventing the creation of a template version.
+"""
+enum CreateTemplateVersionPermissionReason {
+  PERMISSION_DENIED
+  PIPELINE_IS_ALREADY_FROM_TEMPLATE
+  NO_NEW_TEMPLATE_VERSION_AVAILABLE
+  PIPELINE_IS_NOTEBOOK
 }
 
 """
@@ -1390,7 +1404,7 @@ input DeletePipelineTemplateInput {
   id: UUID!
 }
 
-"""Represents the result of deleting a pipeline."""
+"""Represents the result of deleting a template."""
 type DeletePipelineTemplateResult {
   success: Boolean!
   errors: [PipelineTemplateError!]!
@@ -1577,8 +1591,8 @@ enum DHIS2ConnectionStatus {
 
 """DHIS2 metadata item"""
 type DHIS2MetadataItem {
-  id: String!
-  name: String!
+  id: String
+  label: String!
 }
 
 """Enum representing the type of a DHIS2 metadata item."""
@@ -1591,13 +1605,6 @@ enum DHIS2MetadataType {
   DATA_ELEMENT_GROUPS
   INDICATORS
   INDICATOR_GROUPS
-}
-
-"""DHIS2 metadata query result"""
-type DHIS2QueryResult {
-  items: [DHIS2MetadataItem!]
-  success: Boolean!
-  error: DHIS2ConnectionError
 }
 
 """DHIS2 metadata query result"""
@@ -2192,7 +2199,18 @@ type Mutation {
   """Creates a new pipeline template version."""
   createPipelineTemplateVersion(input: CreatePipelineTemplateVersionInput!): CreatePipelineTemplateVersionResult!
   createPipelineFromTemplateVersion(input: CreatePipelineFromTemplateVersionInput!): CreatePipelineFromTemplateVersionResult!
+
+  """Deletes a pipeline template."""
   deletePipelineTemplate(input: DeletePipelineTemplateInput): DeletePipelineTemplateResult!
+
+  """Updates an existing template."""
+  updatePipelineTemplate(input: UpdateTemplateInput!): UpdateTemplateResult!
+
+  """Deletes a template version."""
+  deleteTemplateVersion(input: DeleteTemplateVersionInput!): DeleteTemplateVersionResult!
+
+  """Updates a template version."""
+  updateTemplateVersion(input: UpdateTemplateVersionInput!): UpdateTemplateVersionResult!
   createWorkspace(input: CreateWorkspaceInput!): CreateWorkspaceResult!
   updateWorkspace(input: UpdateWorkspaceInput!): UpdateWorkspaceResult!
   deleteWorkspace(input: DeleteWorkspaceInput!): DeleteWorkspaceResult!
@@ -2266,11 +2284,6 @@ type Mutation {
 
   """Pin or unpin a dataset for a workspace."""
   pinDataset(input: PinDatasetInput!): PinDatasetResult!
-
-  """Updates an existing template."""
-  updatePipelineTemplate(input: UpdateTemplateInput!): UpdateTemplateResult!
-  updateTemplateVersion(input: UpdateTemplateVersionInput!): UpdateTemplateVersionResult!
-  deleteTemplateVersion(input: DeleteTemplateVersionInput!): DeleteTemplateVersionResult!
 }
 
 type NotebookServer {
@@ -2333,6 +2346,8 @@ input ParameterInput {
   multiple: Boolean
   required: Boolean
   default: Generic
+  widget: ParameterWidget
+  connection: String
   help: String
   choices: [Generic!]
 }
@@ -2350,6 +2365,18 @@ enum ParameterType {
   s3
   gcs
   custom
+}
+
+"""Enum representing the type of a parameter widget."""
+enum ParameterWidget {
+  DHIS2_ORG_UNITS
+  DHIS2_ORG_UNIT_GROUPS
+  DHIS2_ORG_UNIT_LEVELS
+  DHIS2_DATASETS
+  DHIS2_DATA_ELEMENTS
+  DHIS2_DATA_ELEMENT_GROUPS
+  DHIS2_INDICATORS
+  DHIS2_INDICATOR_GROUPS
 }
 
 """The PermissionMode enum represents the mode of permissions for a team."""
@@ -2409,7 +2436,7 @@ type Pipeline {
   template: PipelineTemplate
   sourceTemplate: PipelineTemplate
   hasNewTemplateVersions: Boolean!
-  newTemplateVersions: [PipelineTemplateVersion!]
+  newTemplateVersions: [PipelineTemplateVersion!]!
 }
 
 enum PipelineError {
@@ -2417,7 +2444,6 @@ enum PipelineError {
   PIPELINE_VERSION_NOT_FOUND
   PIPELINE_DOES_NOT_SUPPORT_PARAMETERS
   WORKSPACE_NOT_FOUND
-  PIPELINE_ALREADY_EXISTS
   INVALID_CONFIG
   PIPELINE_ALREADY_COMPLETED
   PIPELINE_ALREADY_STOPPED
@@ -2444,6 +2470,8 @@ type PipelineParameter {
   required: Boolean!
   default: Generic
   help: String
+  widget: ParameterWidget
+  connection: String
   choices: [Generic!]
 }
 
@@ -2455,7 +2483,7 @@ type PipelinePermissions {
   schedule: Boolean!
   createVersion: Boolean!
   stopPipeline: Boolean!
-  createTemplateVersion: Boolean!
+  createTemplateVersion: CreateTemplateVersionPermission!
 }
 
 """Represents a recipient of a pipeline."""
@@ -2735,7 +2763,7 @@ enum PrepareObjectUploadError {
 
 """
 Input for preparing to upload an object to a workspace's bucket.
-The `contentType`
+The `contentType` 
 """
 input PrepareObjectUploadInput {
   workspaceSlug: String!
@@ -2800,8 +2828,8 @@ type Query {
   countries: [Country!]!
   notebooksUrl: URL!
 
-  """Retrieves a page of pipelines."""
-  pipelines(workspaceSlug: String, page: Int, perPage: Int): PipelinesPage!
+  """Retrieves a page of pipelines ordered by relevant name."""
+  pipelines(workspaceSlug: String, name: String, page: Int, perPage: Int): PipelinesPage!
 
   """Retrieves a pipeline by ID."""
   pipeline(id: UUID!): Pipeline
@@ -2812,12 +2840,14 @@ type Query {
   """Retrieves a pipeline by workspace slug and code."""
   pipelineByCode(workspaceSlug: String!, code: String!): Pipeline
 
-  """Retrieves a template by code."""
-  templateByCode(code: String!): PipelineTemplate
-
   """Retrieves a pipeline run by ID."""
   pipelineRun(id: UUID!): PipelineRun
+
+  """Retrieves a page of pipeline templates."""
   pipelineTemplates(page: Int = 1, perPage: Int = 15, search: String, workspaceSlug: String): PipelineTemplatePage!
+
+  """Retrieves a template by workspace slug and code."""
+  templateByCode(code: String!): PipelineTemplate
   workspace(slug: String!): Workspace
   workspaces(query: String, page: Int, perPage: Int): WorkspacePage!
   pendingWorkspaceInvitations(page: Int! = 1, perPage: Int = 10): WorkspaceInvitationPage!
