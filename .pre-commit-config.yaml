@@ -3,11 +3,11 @@ repos:
   hooks:
     - id: run-backend-pre-commit
       name: Run Backend Pre-Commit
-      entry: ./backend/pre-commit.sh
+      entry: ./backend/script/pre-commit.sh
       language: system
       types: [python]
     - id: run-frontend-pre-commit
       name: Run Frontend Pre-Commit
-      entry: ./frontend/pre-commit.sh
+      entry: ./frontend/script/pre-commit.sh
       language: system
       types: [javascript, typescript]
