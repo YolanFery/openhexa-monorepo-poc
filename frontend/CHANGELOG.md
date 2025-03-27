@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.75.2](https://github.com/YolanFery/openhexa-monorepo-poc/compare/openhexa-frontend-0.76.0...openhexa-frontend-0.75.2) (2025-03-27)
+
+
+### Features
+
+* dummy ([4cbc40f](https://github.com/YolanFery/openhexa-monorepo-poc/commit/4cbc40fcc5cfcffb3e94b6519dcba2d7d4c23404))
+* Test ([611f062](https://github.com/YolanFery/openhexa-monorepo-poc/commit/611f062f70091c95f15b3c5f4806ce9b7dec221f))
+
+
+### Bug Fixes
+
+* **Mixpanel:** Set a timeout on the mixpanel requests & never retry to send events ([#897](https://github.com/YolanFery/openhexa-monorepo-poc/issues/897)) ([6f6b9ef](https://github.com/YolanFery/openhexa-monorepo-poc/commit/6f6b9efdf6fac695523aba1ea2ade3fcaf858cec))
+
+
+### Miscellaneous Chores
+
+* Release 0.53.2 ([4f271d2](https://github.com/YolanFery/openhexa-monorepo-poc/commit/4f271d215ac49c06cab92a7337056f824e9375b3))
+* Release 0.74.7 ([3b24cca](https://github.com/YolanFery/openhexa-monorepo-poc/commit/3b24ccad21b3d3afd9601b078bce0ff72d4f6df0))
+* Release 0.75.2 ([81f1d84](https://github.com/YolanFery/openhexa-monorepo-poc/commit/81f1d8428fd090311fd67e7d06ae53a3d90bded3))
+
 ## [0.76.0](https://github.com/YolanFery/openhexa-monorepo-poc/compare/0.75.2...0.76.0) (2025-03-25)
 
 
